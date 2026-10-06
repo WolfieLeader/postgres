@@ -142,6 +142,13 @@ t('Array of Box', async() => [
   (await sql`select ${ '{(1,2),(3,4);(4,5),(6,7)}' }::box[] as x`)[0].x.join(';')
 ])
 
+t('Built-in array types without fetch_types', async() => {
+  const sql = postgres({ ...options, fetch_types: false })
+  const [{ x, y }] = await sql`select array['a', 'b']::text[] as x, array[1, 2]::int4[] as y`
+  const [{ z }] = await sql`select ${ sql.array(['c', 'd']) }::text[] as z`
+  return ['b,2,d', [x[1], y[1], z[1]].join(), await sql.end()]
+})
+
 t('Nested array n2', async() =>
   ['4', (await sql`select ${ sql.array([[1, 2], [3, 4]]) } as x`)[0].x[1][1]]
 )

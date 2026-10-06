@@ -182,6 +182,21 @@ function notTagged() {
 export const serializers = defaultHandlers.serializers
 export const parsers = defaultHandlers.parsers
 
+export function addArrayType(options, oid, typarray) {
+  if (!!options.parsers[typarray] && !!options.serializers[typarray]) return
+  const parser = options.parsers[oid]
+  options.shared.typeArrayMap[oid] = typarray
+  options.parsers[typarray] = (xs) => arrayParser(xs, parser, typarray)
+  options.parsers[typarray].array = true
+  options.serializers[typarray] = (xs) => arraySerializer(xs, options.serializers[oid], options, typarray)
+}
+
+export const builtinArrayTypes = [
+  [16, 1000], [17, 1001], [18, 1002], [19, 1003], [20, 1016], [21, 1005], [23, 1007], [25, 1009],
+  [26, 1028], [114, 199], [700, 1021], [701, 1022], [1042, 1014], [1043, 1015], [1082, 1182],
+  [1083, 1183], [1114, 1115], [1184, 1185], [1186, 1187], [1700, 1231], [2950, 2951], [3802, 3807]
+]
+
 export const END = {}
 
 function firstIsString(x) {
